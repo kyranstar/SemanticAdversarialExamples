@@ -1,0 +1,8 @@
+training_checkpoints_mnist/
+models/*.meta
+models/*.index
+models/*.data*
+images/
+examples/
+__pycache__/
+tflib/

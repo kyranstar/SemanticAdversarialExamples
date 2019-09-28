@@ -270,18 +270,15 @@ def train_step(images, epoch):
 Eager execution can be slower than executing the equivalent graph as it can't benefit from whole-program optimizations on the graph, and also incurs overheads of interpreting Python code. By using [tf.contrib.eager.defun](https://www.tensorflow.org/api_docs/python/tf/contrib/eager/defun) to create graph functions, we get a ~20 secs/epoch performance boost (from ~50 secs/epoch down to ~30 secs/epoch). This way we get the best of both eager execution (easier for debugging) and graph mode (better performance).
 """
 
-# train_step = tf.contrib.eager.defun(train_step)
-
 
 def train(dataset, epochs):
+    generate_and_save_images(generator, 1, random_vector_for_generation)
     print("Training")
-    current_step = 0
     for epoch in range(epochs):
         start = time.time()
 
-        for images in tqdm(dataset):
+        for current_step, images in tqdm(enumerate(dataset)):
             train_step(images, current_step)
-            current_step += 1
 
         display.clear_output(wait=True)
         generate_and_save_images(generator,
@@ -353,14 +350,6 @@ def convert_array_to_image(array):
     """Converts a numpy array to a PIL Image and undoes any rescaling."""
     img = PIL.Image.fromarray(np.uint8((array + 1.0) / 2.0 * 255), mode='L')
     return img
-
-
-pred = generator(random_vector_for_generation, training=False)
-generate_and_save_images(generator, 1, random_vector_for_generation)
-# print(pred[0].shape)
-# predi = convert_array_to_image(pred[0])
-# plt.imshow(predi)
-# plt.show()
 
 """## Train the GANs
 We will call the train() method defined above to train the generator and discriminator simultaneously. Note, training GANs can be tricky. It's important that the generator and discriminator do not overpower each other (e.g., that they train at a similar rate).
